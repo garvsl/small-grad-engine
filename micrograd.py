@@ -71,8 +71,13 @@ class Value:
   __repr__: provides the string representation of the object
   __add__: allows u to define the behavior of the addition operator when used with objects of the class
   """
-  def __init__(self, data):
+  def __init__(self, data, _children=(), _op=''): # creating children as an immutable list
     self.data = data
+    self._prev = set(_children) # set to remove duplicates
+  #  Need connective tissue, and want to make this a graph --
+  # so we need pointers to know what values create other values
+  # Thus prev is introduced
+    self._op = _op
 
   def __repr__(self):
     return f"Value(data={self.data})"
@@ -81,11 +86,22 @@ class Value:
     """
     Takes another value, and takes its sellf and then gets its own value and adds it to the other and returns it
     """
-    out = Value(self.data + other.data)
+    out = Value(self.data + other.data, (self, other), '+') # feed in children of the val, which is a tuple of itself and other
+    return out
+
+  def __mul__(self, other):
+    out = Value(self.data * other.data , (self, other), '*') # feed in children of the val, which is a tuple of itself and other
     return out
 
 a = Value(2.0)
-b = Value(3.0)
+b = Value(-3.0)
+c = Value(10.0)
 # Self is a in this instance, and b is the other
-a + b
+d = a*b + c # Which is the same as (a.mul(b)).add(c)
+d
 
+d._prev # set of children, which is (a*b) and c
+
+d._op # d was made via addition of the two values
+
+# Now we have a datastructure where we know exactly how each value came to be, like what numbers made it and what operation
