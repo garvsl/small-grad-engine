@@ -114,6 +114,12 @@ o = n.tanh()
 print(o)
 # Squashed the input
 
-o.grad = 1.0
+o.grad = 1.0 # Since grad starts as zero, we need to set the base case to 1.0
+o._backward()
 
-# o = tanh(n)
+print(n.grad) # Gets propagated
+
+n._backward()
+
+print(b.grad)
+
