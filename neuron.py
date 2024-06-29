@@ -66,13 +66,29 @@ class Neuron(nn.Module):
     out = torch.tanh(activation) # Activation function (Tanh)
     return out
 
+class Layer(nn.Module):
+
+  def __init__(self, nin, nout):
+    """
+    nin = number of inputs come to a neuron
+    nout = number of neurons in the layer
+    """
+    super(Layer, self).__init__()
+    self.neurons = [Neuron(nin) for _ in range(nout)] # Create a list of neurons
+
+  def __call__(self, x):
+    outs = [n(x) for n in self.neurons] # Call each neuron with the x
+    return outs
+
 nin = 3  # Number of inputs
 neuron = Neuron(nin)
 
 # Create a sample input
-x = torch.Tensor([0.5, -0.2, 0.1])
+x = torch.Tensor([0.5, -0.2])
+n = Layer(2, 3)
+out = n(x)
 
 # Get the output of the neuron
-output = neuron(x)
-print(output.item())
+# output = neuron(x)
+print(out)
 
