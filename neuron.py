@@ -62,7 +62,7 @@ class Neuron(nn.Module):
     # Now we can loop through it and multiply the two together, then sum them
     # activation = sum(wi*xi for wi,xi in zipped, self.b)
     # out = activation.tanh()
-    activation = torch.sum(self.w * x) + self.b # Weighted sum plus bias
+    activation = torch.dot(self.w, x) + self.b # Weighted sum plus bias
     out = torch.tanh(activation) # Activation function (Tanh)
     return out
 
@@ -80,12 +80,38 @@ class Layer(nn.Module):
     outs = [n(x) for n in self.neurons] # Call each neuron with the x
     return outs
 
+class MLP:
+  def __init__(self, nin, nouts):
+    """
+    nin = number of inputs come to a neuron
+    nout = a list specifying number of neurons in each layer
+    """
+
+    sz = [nin] + nouts # Put them all together, sizes
+    self.layers = [Layer(sz[i], sz[i+1]) for i in range(len(nouts))]
+    #Iterate over consecutive pair of the sizes & and create layer objects for each size
+
+  def __call__(self, x):
+    for layer in self.layers:
+      x = torch.cat(layer(x)) #Concaetenate the outputs to a single tesnor
+    return x
+
+      #calling them sequentially
+
 nin = 3  # Number of inputs
 neuron = Neuron(nin)
 
 # Create a sample input
 x = torch.Tensor([0.5, -0.2])
 n = Layer(2, 3)
+out = n(x)
+
+# Get the output of the neuron
+# output = neuron(x)
+print(out)
+
+x = torch.Tensor([0.5, -0.2, 0.1])
+n = MLP(3, [4, 4, 1])
 out = n(x)
 
 # Get the output of the neuron
